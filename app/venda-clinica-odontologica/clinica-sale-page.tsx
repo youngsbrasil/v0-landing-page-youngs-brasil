@@ -274,6 +274,9 @@ export default function ClinicaSalePage() {
                 faturamento garantido. É entrar já trabalhando e ganhando dinheiro.
               </p>
             </Reveal>
+            <Reveal delay={0.2}>
+              <PriceTag />
+            </Reveal>
             <Reveal delay={0.24}>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <a
@@ -436,6 +439,23 @@ export default function ClinicaSalePage() {
               pessoalmente. Vagas de negociação limitadas.
             </p>
           </Reveal>
+          <Reveal delay={0.16}>
+            <div className="mx-auto mt-8 inline-flex flex-col items-center rounded-2xl border border-teal-400/30 bg-white/5 px-8 py-5 backdrop-blur-sm">
+              <span className="text-xs font-semibold uppercase tracking-wide text-teal-300">
+                Valor de venda
+              </span>
+              <motion.span
+                className="text-4xl font-extrabold tracking-tight sm:text-5xl"
+                animate={{ scale: [1, 1.04, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                R$ 289 <span className="text-teal-400">mil</span>
+              </motion.span>
+              <span className="mt-1 text-sm text-slate-300">
+                Valor e forma de pagamento negociáveis
+              </span>
+            </div>
+          </Reveal>
           <Reveal delay={0.2}>
             <a
               href={WHATSAPP_URL}
@@ -480,6 +500,48 @@ export default function ClinicaSalePage() {
         <WhatsappIcon className="relative h-7 w-7" />
       </a>
     </main>
+  )
+}
+
+function PriceTag() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 200, damping: 16, delay: 0.2 }}
+      className="mt-7 max-w-md"
+    >
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-500 p-[2px] shadow-xl shadow-teal-600/25">
+        {/* animated shine */}
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          initial={{ x: "-150%" }}
+          animate={{ x: "150%" }}
+          transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 1.4, ease: "easeInOut" }}
+        />
+        <div className="relative flex items-center gap-4 rounded-[14px] bg-white px-5 py-4">
+          <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-600">
+            <Wallet className="h-6 w-6" />
+          </span>
+          <div className="leading-tight">
+            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+              Valor de venda
+            </p>
+            <motion.p
+              className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              R$ 289 <span className="text-teal-600">mil</span>
+            </motion.p>
+            <p className="mt-0.5 text-xs font-medium text-slate-500">
+              Valor e forma de pagamento negociáveis
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   )
 }
 

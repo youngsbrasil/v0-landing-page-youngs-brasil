@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Comercial — NRTrix IA | Young's Brasil</title>
+<meta name="description" content="Proposta de desenvolvimento do MVP da plataforma NRTrix IA — pré-auditoria de conformidade em SST.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --neon:#39ff14;
+    --neon-2:#00bb7f;
+    --bg:#0a0a0a;
+    --ink:#000000;
+    --panel:#111111;
+    --line:#232323;
+    --white:#fafafa;
+    --mut:#8f8f8f;
+    --mut-2:#c7c7c7;
+    --disp:"Space Grotesk",sans-serif;
+    --mono:"JetBrains Mono",monospace;
+    --body:"Inter",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--mut-2);font-family:var(--body);
+    line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  /* scanline / grain atmosphere */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:3;
+    background:repeating-linear-gradient(to bottom,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
+    mix-blend-mode:overlay;opacity:.5;
+  }
+  ::selection{background:var(--neon);color:#000}
+  a{color:inherit;text-decoration:none}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .eyebrow{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--neon);display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow .bar{height:1px;width:34px;background:var(--neon);display:inline-block}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:10;background:rgba(10,10,10,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;color:var(--white);font-size:1.15rem}
+  .brand b{color:var(--neon)}
+  .brand .flag{display:inline-block;width:22px;height:14px;margin-left:7px;vertical-align:middle;
+    background:
+      linear-gradient(#009c3b,#009c3b) center/100% 100%;
+    border-radius:2px;position:relative;overflow:hidden}
+  .brand .flag::after{content:"";position:absolute;inset:3px;background:#ffdf00;
+    clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+  .topbar .cta-mini{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+    color:#000;background:var(--neon);padding:8px 16px;border-radius:2px;font-weight:700;transition:.2s}
+  .topbar .cta-mini:hover{background:#fff}
+
+  /* ---------- hero ---------- */
+  .hero{background:var(--neon);color:#000;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,.05) 0 1px,transparent 1px 4px);opacity:.6}
+  .hero .wrap{position:relative;z-index:2;padding:88px 28px 76px}
+  .hero .kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;
+    font-weight:500;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero h1{font-family:var(--disp);font-weight:700;letter-spacing:-.035em;line-height:.9;
+    font-size:clamp(3.4rem,13vw,8.5rem);margin:22px 0 8px}
+  .hero .sub{font-family:var(--disp);font-weight:500;font-size:clamp(1.1rem,3.4vw,1.7rem);letter-spacing:-.01em}
+  .hero .tag{font-family:var(--mono);font-size:clamp(.8rem,2.2vw,1rem);margin-top:26px;font-weight:500}
+  .hero .tag span{opacity:.55;padding:0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+  .chip{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;background:#000;color:var(--neon);
+    padding:9px 14px;border-radius:2px}
+  .chip b{color:#fff;font-weight:700}
+
+  /* ---------- section shell ---------- */
+  section.blk{padding:74px 0;border-top:1px solid var(--line)}
+  .snum{font-family:var(--mono);color:var(--neon);font-size:.8rem;letter-spacing:.1em}
+  h2{font-family:var(--disp);font-weight:700;color:var(--white);letter-spacing:-.02em;
+    font-size:clamp(1.7rem,4.6vw,2.7rem);line-height:1.05;margin:14px 0 24px;max-width:20ch}
+  p.lead{font-size:1.08rem;max-width:64ch;color:var(--mut-2)}
+  p+p{margin-top:16px}
+  .hi{color:var(--neon)}
+  strong{color:var(--white);font-weight:600}
+
+  /* two-column cards */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:26px}
+  .card .t{font-family:var(--disp);font-weight:600;color:var(--white);font-size:1.15rem;margin-bottom:8px}
+  .card .t .mono{font-family:var(--mono);color:var(--neon);font-size:.85rem;display:block;letter-spacing:.08em;margin-bottom:6px}
+  .card p{font-size:.98rem;color:var(--mut-2)}
+
+  /* scope lists */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:26px}
+  .lst{list-style:none}
+  .lst li{position:relative;padding:9px 0 9px 26px;border-bottom:1px dashed var(--line);font-size:.98rem}
+  .lst li::before{content:"";position:absolute;left:0;top:16px;width:9px;height:9px;background:var(--neon)}
+  .lst.out li{color:var(--mut)}
+  .lst.out li::before{background:var(--line)}
+  .sublabel{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--white);margin-bottom:10px;display:block}
+  .sublabel.mut{color:var(--mut)}
+
+  /* timeline */
+  .timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px;counter-reset:step}
+  .step{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--neon);border-radius:4px;padding:24px 22px}
+  .step .no{font-family:var(--disp);font-weight:700;font-size:2.6rem;color:var(--neon);line-height:1}
+  .step .wk{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:6px 0 14px}
+  .step .st{font-family:var(--disp);font-weight:600;color:var(--white);font-size:1.05rem;margin-bottom:12px}
+  .step ul{list-style:none;font-size:.9rem;color:var(--mut-2)}
+  .step ul li{padding:5px 0 5px 16px;position:relative}
+  .step ul li::before{content:"›";position:absolute;left:0;color:var(--neon);font-family:var(--mono)}
+
+  /* investment */
+  .invest{background:var(--neon);color:#000;border-radius:6px;padding:38px;margin-top:26px;position:relative;overflow:hidden}
+  .invest::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.05) 0 1px,transparent 1px 4px);opacity:.5;pointer-events:none}
+  .invest .row{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-end;position:relative;z-index:2}
+  .invest .money{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;line-height:.95}
+  .invest .big{font-size:clamp(2.6rem,8vw,4.4rem)}
+  .invest .lbl{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+  .invest .divv{width:1px;align-self:stretch;background:rgba(0,0,0,.25)}
+  .invest .note{font-family:var(--mono);font-size:.82rem;margin-top:22px;position:relative;z-index:2;line-height:1.6}
+  .invest .note b{font-weight:700}
+
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;margin-top:26px;font-size:.94rem}
+  .tbl th{background:#000;color:var(--neon);font-family:var(--mono);font-weight:500;font-size:.74rem;
+    letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:12px 14px;border:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border:1px solid var(--line);color:var(--mut-2)}
+  .tbl tr:nth-child(even) td{background:#101010}
+  .tbl td:last-child{color:var(--white);font-family:var(--mono);white-space:nowrap}
+  .tiny{font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:14px}
+
+  /* fine print cards */
+  .fine{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+  .fine .card p{font-size:.92rem}
+
+  /* CTA / aceite */
+  .aceite{padding:80px 0}
+  .aceite .box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:44px;text-align:center}
+  .aceite h2{margin:0 auto 14px;max-width:none}
+  .aceite p{max-width:58ch;margin:0 auto 28px;color:var(--mut-2)}
+  .btn{display:inline-block;background:var(--neon);color:#000;font-family:var(--mono);font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;font-size:.82rem;padding:16px 30px;border-radius:3px;
+    border:2px solid var(--neon);transition:.2s}
+  .btn:hover{background:transparent;color:var(--neon)}
+  .sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px;text-align:left}
+  .sign .l{border-top:1px solid #555;padding-top:10px;font-family:var(--mono);font-size:.78rem;color:var(--mut)}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:44px 0 60px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+  footer .brand{font-size:1.35rem}
+  footer .meta{font-family:var(--mono);font-size:.74rem;color:var(--mut);letter-spacing:.06em;text-align:right;line-height:1.9}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .rv.in{opacity:1;transform:none}
+
+  @media (max-width:760px){
+    .grid2,.cols,.timeline,.fine,.sign{grid-template-columns:1fr}
+    .invest .divv{display:none}
+    .invest .row{gap:22px}
+    section.blk{padding:56px 0}
+    .hero .wrap{padding:64px 28px 56px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .rv{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">YOUNG'<b>S</b><span class="flag"></span></div>
+    <a class="cta-mini" href="https://www.youngsbrasil.com.br/falandocomigo" target="_blank" rel="noopener">Falar com a gente</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Proposta Comercial <span>//</span> 02.07.2026 <span>//</span> Válida por 15 dias</div>
+    <h1>NRTrix&nbsp;IA</h1>
+    <div class="sub">Desenvolvimento do MVP — plataforma de pré-auditoria em SST</div>
+    <div class="tag">Growth Marketing <span>//</span> Automação &amp; IA <span>//</span> Vendas &amp; CRM</div>
+    <div class="chips">
+      <div class="chip">CONTRATADA <b>Young's Brasil</b></div>
+      <div class="chip">MODELO <b>R$ 10.000 / mês</b></div>
+      <div class="chip">PRAZO <b>MVP em 3 meses</b></div>
+    </div>
+  </div>
+</header>
+
+<!-- 01 ENTENDIMENTO -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 01 ]</span>
+  <h2>Entendimento do projeto</h2>
+  <p class="lead">A <strong>NRTrix IA</strong> cruza os documentos-mestre de SST (PGR, PCMSO, LTCAT) com os documentos individuais do colaborador (ASO, treinamentos) para apontar inconsistências, calcular um índice de conformidade, estimar passivo e gerar um relatório de auditoria.</p>
+  <p class="lead">O maior valor — e o maior risco técnico — está no <span class="hi">motor de cruzamento apoiado por IA</span> e na base de conhecimento de domínio. Por isso, o MVP é desenhado para provar esse núcleo antes de qualquer investimento na estrutura ampla.</p>
+</div></section>
+
+<!-- 02 ABORDAGEM -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 02 ]</span>
+  <h2>Abordagem</h2>
+  <p class="lead">O MVP existe para responder, barato, duas perguntas: <span class="hi">as pessoas pagam?</span> e <span class="hi">o motor acerta o suficiente?</span></p>
+  <div class="grid2">
+    <div class="card">
+      <div class="t"><span class="mono">// modelo</span>Híbrido: concierge + produto fino</div>
+      <p>Desde a primeira semana, auditorias são vendidas e entregues de forma semi-manual para validar o pagamento, enquanto um produto real e enxuto é construído em paralelo. Os primeiros clientes migram do atendimento manual para o software.</p>
+    </div>
+    <div class="card">
+      <div class="t"><span class="mono">// princípio</span>Precisão acima de automação total</div>
+      <p>Por ser um produto de compliance, o MVP mantém revisão humana na extração dos dados — priorizando a confiança do resultado sobre a automação completa. Um resultado errado no dia 1 custa a venda.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 03 ESCOPO -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 03 ]</span>
+  <h2>Escopo do MVP</h2>
+  <div class="cols">
+    <div>
+      <span class="sublabel">Incluso na entrega</span>
+      <ul class="lst">
+        <li>Autenticação, controle de acesso e isolamento de dados por cliente (RLS)</li>
+        <li>1 empresa por conta, com organização documental por período (envelopes)</li>
+        <li>Upload de PGR, PCMSO e ASO com armazenamento em object storage</li>
+        <li>Extração assistida por IA com tela de revisão humana</li>
+        <li>Base de conhecimento inicial com os 10–15 riscos mais comuns</li>
+        <li>Motor de cruzamento: inconsistências, índice de conformidade e estimativa de passivo</li>
+        <li>Relatório de auditoria em PDF</li>
+        <li>Carteira pré-paga com recarga via PIX e débito por análise</li>
+        <li>Notificações essenciais no aplicativo</li>
+      </ul>
+    </div>
+    <div>
+      <span class="sublabel mut">Fora do escopo — evolução (Fase 2+)</span>
+      <ul class="lst out">
+        <li>Multi-empresa e múltiplas unidades ilimitadas</li>
+        <li>NF-e automática e cobrança por cartão/boleto/recorrência</li>
+        <li>Upgrade/downgrade com cálculo pro-rata</li>
+        <li>Chatbot de IA, alertas de legislação e benchmarking por CNAE</li>
+        <li>Geração e transmissão de XML para o eSocial</li>
+        <li>OCR avançado de documentos escaneados</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 04 CRONOGRAMA -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 04 ]</span>
+  <h2>Cronograma de desenvolvimento</h2>
+  <p class="lead">Três ciclos mensais, com entregáveis verificáveis ao fim de cada mês.</p>
+  <div class="timeline">
+    <div class="step">
+      <div class="no">01</div>
+      <div class="wk">Mês 1 // Semanas 1–4</div>
+      <div class="st">Fundação &amp; de-risco</div>
+      <ul>
+        <li>Ambiente, schema, RLS, auth e storage</li>
+        <li>Base de conhecimento com especialista SST</li>
+        <li>Prova de conceito da extração</li>
+        <li>Landing + validação concierge</li>
+      </ul>
+    </div>
+    <div class="step">
+      <div class="no">02</div>
+      <div class="wk">Mês 2 // Semanas 5–8</div>
+      <div class="st">Núcleo do produto</div>
+      <ul>
+        <li>Upload + extração assistida</li>
+        <li>Motor de cruzamento determinístico</li>
+        <li>Índice, passivo e inconsistências</li>
+        <li>Relatório PDF</li>
+      </ul>
+    </div>
+    <div class="step">
+      <div class="no">03</div>
+      <div class="wk">Mês 3 // Semanas 9–12</div>
+      <div class="st">Monetização &amp; entrega</div>
+      <ul>
+        <li>Carteira + recarga PIX</li>
+        <li>Notificações no app</li>
+        <li>Migração dos design partners</li>
+        <li>Medição de acurácia + entrega</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 05 INVESTIMENTO -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 05 ]</span>
+  <h2>Investimento</h2>
+  <div class="invest">
+    <div class="row">
+      <div class="money">
+        <div class="lbl">Mensalidade</div>
+        <div class="big">R$ 10.000</div>
+      </div>
+      <div class="divv"></div>
+      <div class="money">
+        <div class="lbl">Duração do MVP</div>
+        <div class="big">3 meses</div>
+      </div>
+      <div class="divv"></div>
+      <div class="money">
+        <div class="lbl">Total do MVP</div>
+        <div class="big">R$ 30.000</div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Forma de pagamento:</b> mensal, com vencimento no início de cada ciclo (PIX ou boleto).<br>
+      <b>Continuidade (opcional):</b> após a validação, a evolução para o produto amplo segue em regime de continuidade, mantendo a mesma mensalidade.
+    </div>
+  </div>
+
+  <span class="sublabel" style="margin-top:38px">Custos operacionais de terceiros — não inclusos (repasse)</span>
+  <table class="tbl">
+    <thead><tr><th>Serviço</th><th>Função</th><th>Estimativa inicial</th></tr></thead>
+    <tbody>
+      <tr><td>Supabase (Pro)</td><td>Banco de dados, autenticação, funções</td><td>~US$ 25–75/mês</td></tr>
+      <tr><td>Cloudflare R2</td><td>Armazenamento de documentos</td><td>~US$ 0 (cota grátis)</td></tr>
+      <tr><td>Provedor de IA / OCR</td><td>Extração dos documentos</td><td>centavos / análise</td></tr>
+      <tr><td>Asaas</td><td>Pagamentos (PIX)</td><td>por transação</td></tr>
+      <tr><td>E-mail transacional</td><td>Comunicações</td><td>plano grátis inicial</td></tr>
+    </tbody>
+  </table>
+  <p class="tiny">Baseline de infraestrutura na fase inicial: ~US$ 25–40/mês + variável por uso.</p>
+</div></section>
+
+<!-- 06 PREMISSAS -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 06 ]</span>
+  <h2>Premissas &amp; responsabilidades da contratante</h2>
+  <ul class="lst">
+    <li>Disponibilizar (ou custear) um especialista em SST para popular e validar a base de conhecimento</li>
+    <li>Fornecer documentos reais (PGR/PCMSO/ASO) para calibração e validação de acurácia</li>
+    <li>Prover acesso e titularidade das contas de terceiros (Supabase, Cloudflare, Asaas)</li>
+    <li>Assegurar feedback tempestivo dos design partners durante a validação</li>
+    <li>Entregar documentos em PDF com camada de texto (OCR avançado está fora do escopo)</li>
+  </ul>
+</div></section>
+
+<!-- 07 IP + LGPD -->
+<section class="blk"><div class="wrap rv">
+  <span class="snum">[ 07 ]</span>
+  <h2>Propriedade intelectual &amp; LGPD</h2>
+  <div class="fine">
+    <div class="card">
+      <div class="t"><span class="mono">// titularidade</span>Código e artefatos</div>
+      <p>Todo o código-fonte e os artefatos produzidos são de titularidade da contratante após a quitação integral. Ambas as partes tratam como confidenciais as informações trocadas no projeto.</p>
+    </div>
+    <div class="card">
+      <div class="t"><span class="mono">// conformidade</span>Enquadramento de dados</div>
+      <p>A plataforma é entregue como ferramenta de pré-auditoria orientativa — não constitui garantia de conformidade legal. Prevê assinatura de DPA com sub-operadores e cuidado adicional com os dados sensíveis de saúde do ASO.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ACEITE -->
+<section class="aceite"><div class="wrap rv">
+  <div class="box">
+    <span class="snum">[ 08 ]</span>
+    <h2>Vamos começar?</h2>
+    <p>Basta a assinatura desta proposta e o alinhamento da data de kickoff. A primeira semana já contempla a base de conhecimento e a validação de venda — gerando resultado desde o início.</p>
+    <a class="btn" href="https://www.youngsbrasil.com.br/falandocomigo" target="_blank" rel="noopener">Aprovar &amp; iniciar →</a>
+    <div class="sign">
+      <div class="l">Young's Brasil — nome / assinatura</div>
+      <div class="l">Contratante — nome / assinatura</div>
+    </div>
+  </div>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand">YOUNG'<b>S</b><span class="flag"></span></div>
+    <div class="meta">
+      Growth Marketing // Automação &amp; IA // Vendas &amp; CRM<br>
+      youngsbrasil.com.br — Proposta NRTrix IA — 2026
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

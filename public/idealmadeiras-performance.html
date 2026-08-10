@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Performance — Fev–Mai 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F6F2; --surface: #FFFFFF; --surface2: #F0EEE8;
+    --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.14);
+    --text: #1A1917; --text2: #6B6A66; --text3: #9E9D99;
+    --blue: #185FA5; --blue-light: #E6F1FB; --blue-mid: #378ADD;
+    --green: #3B6D11; --green-light: #EAF3DE; --green-mid: #639922;
+    --amber: #854F0B; --amber-light: #FAEEDA; --amber-mid: #BA7517;
+    --red: #A32D2D; --red-light: #FCEBEB; --red-mid: #E24B4A;
+    --coral: #993C1D; --coral-light: #FAECE7; --coral-mid: #D85A30;
+    --teal: #0F6E56; --teal-light: #E1F5EE; --teal-mid: #1D9E75;
+    --radius: 10px; --radius-lg: 16px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  .page-header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 20px 32px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-dot { width: 10px; height: 10px; background: var(--blue-mid); border-radius: 50%; }
+  .logo-text { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; }
+  .logo-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .header-meta { display: flex; align-items: center; gap: 16px; }
+  .period-badge {
+    font-size: 12px; color: var(--text2); background: var(--surface2);
+    border: 1px solid var(--border); padding: 5px 12px; border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+  .print-btn {
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    background: var(--text); color: #fff; border: none; padding: 7px 16px;
+    border-radius: 8px; cursor: pointer; transition: opacity 0.15s;
+  }
+  .print-btn:hover { opacity: 0.8; }
+
+  /* LAYOUT */
+  .main { max-width: 1140px; margin: 0 auto; padding: 32px 24px 64px; }
+  .section-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 14px; margin-top: 32px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* KPI */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; position: relative; overflow: hidden; transition: border-color 0.15s;
+  }
+  .kpi:hover { border-color: var(--border-strong); }
+  .kpi-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .kpi .label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+  .kpi .value { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+  .kpi .sub { font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+  /* ALERTS */
+  .alerts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .alert-card { border-radius: var(--radius); padding: 16px 18px; border: 1px solid transparent; }
+  .alert-card.warn { background: var(--amber-light); border-color: rgba(186,117,23,0.2); }
+  .alert-card.danger { background: var(--red-light); border-color: rgba(226,75,74,0.2); }
+  .alert-card.good { background: var(--green-light); border-color: rgba(99,153,34,0.2); }
+  .alert-card.info { background: var(--blue-light); border-color: rgba(55,138,221,0.2); }
+  .alert-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .alert-head.warn { color: var(--amber); } .alert-head.danger { color: var(--red); }
+  .alert-head.good { color: var(--green); } .alert-head.info { color: var(--blue); }
+  .alert-body { font-size: 12px; line-height: 1.6; }
+  .alert-body.warn { color: var(--amber); } .alert-body.danger { color: var(--red); }
+  .alert-body.good { color: var(--green); } .alert-body.info { color: var(--blue); }
+
+  /* FUNNEL */
+  .funnel-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr);
+  }
+  .funnel-col { padding: 0 20px; border-right: 1px solid var(--border); text-align: center; }
+  .funnel-col:first-child { padding-left: 0; }
+  .funnel-col:last-child { border-right: none; padding-right: 0; }
+  .funnel-num { font-size: 36px; font-weight: 600; letter-spacing: -0.03em; }
+  .funnel-lbl { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .funnel-conv { font-size: 11px; color: var(--text3); margin-top: 8px; font-family: 'DM Mono', monospace; }
+  .funnel-bar { height: 5px; background: var(--surface2); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+  .funnel-bar-fill { height: 100%; border-radius: 4px; }
+
+  /* CHARTS */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .chart-sub { font-size: 11px; color: var(--text3); margin-bottom: 14px; }
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* INTERACTIVE LEGEND PILLS */
+  .legend-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .leg-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text2);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 20px;
+    cursor: pointer; user-select: none; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .leg-pill:hover { border-color: var(--border-strong); }
+  .leg-pill.active { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+  .leg-pill.inactive { opacity: 0.4; }
+  .leg-pill .l-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* CUSTOM TOOLTIP */
+  .chart-tooltip {
+    position: absolute; pointer-events: none; z-index: 50;
+    background: var(--text); color: #fff;
+    border-radius: 8px; padding: 9px 13px;
+    font-size: 12px; line-height: 1.6;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    white-space: nowrap; transition: opacity 0.1s;
+    transform: translate(-50%, calc(-100% - 12px));
+    min-width: 140px;
+  }
+  .chart-tooltip::after {
+    content: ''; position: absolute; bottom: -5px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--text);
+    border-bottom: none;
+  }
+  .chart-tooltip .tt-label { font-size: 11px; opacity: 0.6; margin-bottom: 4px; }
+  .chart-tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .chart-tooltip .tt-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* MONTH CARDS */
+  .months-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .month-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s;
+  }
+  .month-card:hover { border-color: var(--border-strong); }
+  .month-header {
+    padding: 14px 18px 12px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .month-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .month-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 600; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 20px; }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-coral { background: var(--coral-light); color: var(--coral); }
+  .month-body { padding: 14px 18px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .stat-item .stat-lbl { font-size: 10px; color: var(--text3); margin-bottom: 2px; }
+  .stat-item .stat-val { font-size: 14px; font-weight: 500; }
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+  .cv-bar { height: 5px; background: var(--surface2); border-radius: 4px; margin-top: 4px; overflow: hidden; }
+  .cv-bar-fill { height: 100%; border-radius: 4px; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center; font-size: 11px; color: var(--text3);
+    padding: 24px; border-top: 1px solid var(--border);
+    margin-top: 24px; font-family: 'DM Mono', monospace;
+  }
+
+  .fade-in { animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  @media print {
+    .page-header { position: static; }
+    .print-btn { display: none; }
+    body { background: white; }
+    .month-card, .chart-card, .kpi { break-inside: avoid; }
+  }
+  @media (max-width: 640px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .alerts-grid { grid-template-columns: 1fr; }
+    .funnel-section { grid-template-columns: 1fr; }
+    .funnel-col { border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; text-align: left; }
+    .funnel-col:last-child { border-bottom: none; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="logo-area">
+    <div class="logo-dot"></div>
+    <div>
+      <div class="logo-text">Dashboard de Performance</div>
+      <div class="logo-sub">ADS · Leads · Conversão · ROI</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span class="period-badge">Fev – Mai / 2026</span>
+    <button class="print-btn" onclick="window.print()">↓ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="section-label">KPIs acumulados</div>
+  <div class="kpi-grid fade-in" id="kpi-grid"></div>
+
+  <div class="section-label" style="margin-top:28px">Alertas &amp; recomendações estratégicas</div>
+  <div class="alerts-grid" id="alerts-grid"></div>
+
+  <div class="section-label">Funil de conversão — total acumulado</div>
+  <div class="funnel-section" id="funnel"></div>
+
+  <div class="section-label">Evolução mensal</div>
+  <div class="charts-grid">
+
+    <div class="chart-card">
+      <div class="chart-title">ROAS &amp; ROI por mês</div>
+      <div class="chart-sub">Clique nas séries para mostrar/ocultar · Passe o mouse para ver os valores</div>
+      <div class="legend-row" id="leg1"></div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="c1" role="img" aria-label="ROAS e ROI mensal fev a mai 2026">ROAS e ROI mensais de fevereiro a maio de 2026.</canvas>
+        <div class="chart-tooltip" id="tt1" style="opacity:0;left:0;top:0"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">CPL &amp; CAC por mês</div>
+      <div class="chart-sub">Clique nas séries para mostrar/ocultar · Passe o mouse para ver os valores</div>
+      <div class="legend-row" id="leg2"></div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="c2" role="img" aria-label="CPL e CAC mensal fev a mai 2026">CPL e CAC mensais de fevereiro a maio de 2026.</canvas>
+        <div class="chart-tooltip" id="tt2" style="opacity:0;left:0;top:0"></div>
+      </div>
+    </div>
+
+    <div class="chart-card full">
+      <div class="chart-title">Funil mês a mês — leads, orçamentos e pedidos</div>
+      <div class="chart-sub">Clique nas séries para mostrar/ocultar · Passe o mouse para ver os valores</div>
+      <div class="legend-row" id="leg3"></div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="c3" role="img" aria-label="Funil mensal leads orçamentos pedidos">Volume de leads, orçamentos e pedidos por mês.</canvas>
+        <div class="chart-tooltip" id="tt3" style="opacity:0;left:0;top:0"></div>
+      </div>
+    </div>
+
+    <div class="chart-card full">
+      <div class="chart-title">Taxas de conversão — lead → orçamento → pedido</div>
+      <div class="chart-sub">Clique nas séries para mostrar/ocultar · Passe o mouse para ver os valores</div>
+      <div class="legend-row" id="leg4"></div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="c4" role="img" aria-label="Taxas de conversão mensal">Taxas de conversão por etapa do funil, mês a mês.</canvas>
+        <div class="chart-tooltip" id="tt4" style="opacity:0;left:0;top:0"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Detalhamento por mês</div>
+  <div class="months-grid" id="months-grid"></div>
+
+  <div class="footer">
+    Gerado em junho/2026 · Período analisado: Fev – Mai 2026 · 4 meses · Dados internos
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const D = [
+  { name:'Fev/26', fat:78076,  ads:6219, gestao:4000, leads:519, orc:91,  ped:24 },
+  { name:'Mar/26', fat:82329,  ads:4789, gestao:4000, leads:565, orc:119, ped:24 },
+  { name:'Abr/26', fat:106308, ads:6224, gestao:4000, leads:484, orc:111, ped:18 },
+  { name:'Mai/26', fat:72695,  ads:5632, gestao:4000, leads:589, orc:147, ped:18 },
+];
+
+function calc(m) {
+  const tot = m.ads + m.gestao;
+  return {
+    tot, roas: m.fat/m.ads,
+    roi: ((m.fat-tot)/tot)*100,
+    cpl: tot/m.leads, cac: tot/m.ped,
+    ticket: m.fat/m.ped,
+    cvLO: (m.orc/m.leads)*100,
+    cvOP: (m.ped/m.orc)*100,
+    cvLP: (m.ped/m.leads)*100,
+  };
+}
+const R = D.map(calc);
+const totFat   = D.reduce((a,m)=>a+m.fat,0);
+const totAds   = D.reduce((a,m)=>a+m.ads,0);
+const totGest  = D.reduce((a,m)=>a+m.gestao,0);
+const totLeads = D.reduce((a,m)=>a+m.leads,0);
+const totOrc   = D.reduce((a,m)=>a+m.orc,0);
+const totPed   = D.reduce((a,m)=>a+m.ped,0);
+const totTot   = totAds+totGest;
+const totRoas  = totFat/totAds;
+const totRoi   = ((totFat-totTot)/totTot)*100;
+const totCpl   = totTot/totLeads;
+const totCac   = totTot/totPed;
+const totTick  = totFat/totPed;
+const labels   = D.map(m=>m.name);
+
+function brl(n){ return 'R$\u00a0'+Math.round(n).toLocaleString('pt-BR'); }
+function pct(n){ return n.toFixed(1)+'%'; }
+function xf(n) { return n.toFixed(2)+'x'; }
+
+/* ── KPI GRID ── */
+const kpis = [
+  { label:'Faturamento total', value:brl(totFat), color:'#378ADD', sub:'4 meses acumulados' },
+  { label:'Custo total (ADS + Gestão)', value:brl(totTot), color:'#888780', sub:`ADS ${brl(totAds)} · Gestão ${brl(totGest)}` },
+  { label:'ROAS acumulado', value:xf(totRoas), color:'#378ADD', sub:'faturamento ÷ invest. ADS' },
+  { label:'ROI acumulado', value:pct(totRoi), color:'#3B6D11', sub:'sobre custo total' },
+  { label:'CPL médio', value:brl(totCpl), color:'#BA7517', sub:`${totLeads} leads gerados` },
+  { label:'CAC médio', value:brl(totCac), color:'#993C1D', sub:`${totPed} clientes adquiridos` },
+  { label:'Ticket médio', value:brl(totTick), color:'#0F6E56', sub:'por pedido fechado' },
+  { label:'Conv. Lead → Pedido', value:pct(totPed/totLeads*100), color:'#534AB7', sub:`${totOrc} orçamentos emitidos` },
+];
+const kg = document.getElementById('kpi-grid');
+kpis.forEach(k => {
+  kg.innerHTML += `<div class="kpi">
+    <div class="kpi-accent" style="background:${k.color}"></div>
+    <div class="label">${k.label}</div>
+    <div class="value" style="color:${k.color}">${k.value}</div>
+    <div class="sub">${k.sub}</div>
+  </div>`;
+});
+
+/* ── ALERTS ── */
+const alerts = [
+  { type:'danger', icon:'⚠', title:'Queda na conversão orç. → pedido',
+    body:'Mar/26 converteu 20,2% dos orçamentos em pedidos. Em Mai/26 essa taxa caiu para 12,2% — com 147 orçamentos, o maior volume do período. Se replicasse a taxa de março, seriam ~30 pedidos em vez de 18. Investigue o processo de fechamento comercial urgentemente.' },
+  { type:'warn', icon:'◐', title:'Mai/26: mais leads, menos resultado',
+    body:'Maio gerou o maior volume de leads (589) e orçamentos (147), porém o menor faturamento do período (R$\u00a072.695). Isso indica desalinhamento entre qualidade de lead e perfil de comprador. Revise a segmentação dos anúncios e o ICP (perfil de cliente ideal).' },
+  { type:'good', icon:'✓', title:'ROAS consistentemente saudável',
+    body:'Todos os meses mantiveram ROAS acima de 12x, com destaque para Mar/26 (17,19x) com o menor investimento do período. O ROI nunca ficou abaixo de 540%. A mídia paga está gerando retorno sólido — o gargalo está na conversão, não na mídia.' },
+  { type:'good', icon:'✓', title:'Abr/26: melhor mês em faturamento',
+    body:'R$\u00a0106.308 de faturamento com ROAS de 17,08x e ROI de 930%. Identifique o que foi diferente: tipo de campanha, criativo, público, oferta ou sazonalidade. Replicar este padrão é a alavanca de crescimento mais rápida disponível.' },
+  { type:'info', icon:'→', title:'CPL ótimo, mas CAC precisa de atenção',
+    body:'O CPL médio de R$\u00a016,62 é excelente considerando o ticket de R$\u00a03.679. Porém o CAC de R$\u00a0368 subiu em Abr e Mai em razão da queda no número de pedidos. Reduzir o CAC requer melhorar a conversão comercial, não cortar ADS.' },
+  { type:'info', icon:'→', title:'Oportunidade: nutrição de orçamentos',
+    body:'Com 468 orçamentos emitidos no período e apenas 84 pedidos (18% de conversão), há uma base grande de leads quentes ainda não convertidos. Um fluxo de reativação (WhatsApp, e-mail, ligação) pode gerar receita incremental sem novo investimento em mídia.' },
+];
+const ag = document.getElementById('alerts-grid');
+alerts.forEach(a => {
+  ag.innerHTML += `<div class="alert-card ${a.type}">
+    <div class="alert-head ${a.type}">${a.icon} ${a.title}</div>
+    <div class="alert-body ${a.type}">${a.body}</div>
+  </div>`;
+});
+
+/* ── FUNNEL ── */
+const fu = document.getElementById('funnel');
+const cLO=(totOrc/totLeads*100).toFixed(1), cOP=(totPed/totOrc*100).toFixed(1), cLP=(totPed/totLeads*100).toFixed(1);
+fu.innerHTML=`
+  <div class="funnel-col">
+    <div class="funnel-num" style="color:#378ADD">${totLeads.toLocaleString('pt-BR')}</div>
+    <div class="funnel-lbl">Leads gerados</div>
+    <div class="funnel-conv">topo do funil</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:10px">volume relativo</div>
+    <div class="funnel-bar"><div class="funnel-bar-fill" style="width:100%;background:#378ADD"></div></div>
+  </div>
+  <div class="funnel-col">
+    <div class="funnel-num" style="color:#1D9E75">${totOrc}</div>
+    <div class="funnel-lbl">Orçamentos</div>
+    <div class="funnel-conv">${cLO}% dos leads</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:10px">&nbsp;</div>
+    <div class="funnel-bar"><div class="funnel-bar-fill" style="width:${cLO}%;background:#1D9E75"></div></div>
+  </div>
+  <div class="funnel-col">
+    <div class="funnel-num" style="color:#D85A30">${totPed}</div>
+    <div class="funnel-lbl">Pedidos fechados</div>
+    <div class="funnel-conv">${cOP}% dos orç · ${cLP}% dos leads</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:10px">&nbsp;</div>
+    <div class="funnel-bar"><div class="funnel-bar-fill" style="width:${cLP}%;background:#D85A30"></div></div>
+  </div>`;
+
+/* ── CHART HELPERS ── */
+
+// Custom external tooltip renderer — always floats above the point, never clipped
+function makeTooltipPlugin(ttEl) {
+  return {
+    id: 'customTooltip',
+    afterEvent(chart, args) {
+      const { event } = args;
+      if (event.type === 'mouseout') { ttEl.style.opacity = '0'; return; }
+    },
+    afterDraw(chart) {
+      const active = chart.tooltip._active;
+      if (!active || !active.length) { ttEl.style.opacity = '0'; return; }
+      const { x, y } = chart.tooltip;
+      const datasets = chart.data.datasets;
+      const label = chart.data.labels[active[0].index];
+
+      let rows = '';
+      active.forEach(pt => {
+        const ds = datasets[pt.datasetIndex];
+        if (ds.hidden) return;
+        const raw = ds.data[pt.index];
+        const fmt = ds._fmt ? ds._fmt(raw) : raw;
+        rows += `<div class="tt-row"><span class="tt-dot" style="background:${ds.borderColor||ds.backgroundColor}"></span>${ds.label}: <strong>${fmt}</strong></div>`;
+      });
+      if (!rows) { ttEl.style.opacity = '0'; return; }
+
+      ttEl.innerHTML = `<div class="tt-label">${label}</div>${rows}`;
+
+      // Position: centred on x, above y — clamped to canvas bounds
+      const canvasRect = chart.canvas.getBoundingClientRect();
+      const wrapRect   = ttEl.parentElement.getBoundingClientRect();
+      const relX = x;
+      const relY = y;
+
+      ttEl.style.left = relX + 'px';
+      ttEl.style.top  = relY + 'px';
+      ttEl.style.opacity = '1';
+    }
+  };
+}
+
+// Build interactive legend pills and wire toggle
+function buildLegend(containerId, chart, defs) {
+  const el = document.getElementById(containerId);
+  defs.forEach((d, i) => {
+    const pill = document.createElement('button');
+    pill.className = 'leg-pill active';
+    pill.setAttribute('aria-pressed', 'true');
+    pill.innerHTML = `<span class="l-swatch" style="background:${d.color};${d.dash?'background:transparent;border:2px dashed '+d.color+';':''}"></span>${d.label}`;
+    pill.addEventListener('click', () => {
+      const ds = chart.data.datasets[i];
+      ds.hidden = !ds.hidden;
+      pill.className = 'leg-pill ' + (ds.hidden ? 'inactive' : 'active');
+      pill.setAttribute('aria-pressed', ds.hidden ? 'false' : 'true');
+      chart.update();
+    });
+    el.appendChild(pill);
+  });
+}
+
+// Shared tooltip options: disable built-in, use external
+const tooltipOff = { enabled: false };
+const interactionNearest = { mode: 'index', intersect: false };
+
+/* ── CHART 1: ROAS + ROI ── */
+const tt1 = document.getElementById('tt1');
+const ch1 = new Chart(document.getElementById('c1'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'ROAS', _fmt: v => v.toFixed(2)+'x',
+        data: R.map(r => +r.roas.toFixed(2)),
+        backgroundColor: '#B5D4F4', borderColor: '#378ADD', borderWidth: 1.5,
+        yAxisID: 'y', order: 2
+      },
+      {
+        label: 'ROI %', _fmt: v => v.toFixed(1)+'%',
+        data: R.map(r => +r.roi.toFixed(1)),
+        type: 'line', borderColor: '#639922', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [5,4], pointBackgroundColor: '#639922',
+        pointRadius: 6, pointHoverRadius: 8, yAxisID: 'y2', tension: 0.35, order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: interactionNearest,
+    plugins: { legend: { display: false }, tooltip: tooltipOff, customTooltip: {} },
+    scales: {
+      x: { ticks: { autoSkip: false, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y: { title: { display: true, text: 'ROAS', font: { size: 10 }, color: '#378ADD' }, ticks: { callback: v => v+'x', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y2: { position: 'right', title: { display: true, text: 'ROI %', font: { size: 10 }, color: '#639922' }, ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { drawOnChartArea: false } }
+    }
+  },
+  plugins: [makeTooltipPlugin(tt1)]
+});
+buildLegend('leg1', ch1, [
+  { label: 'ROAS', color: '#B5D4F4' },
+  { label: 'ROI %', color: '#639922', dash: true }
+]);
+
+/* ── CHART 2: CPL + CAC ── */
+const tt2 = document.getElementById('tt2');
+const ch2 = new Chart(document.getElementById('c2'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'CPL', _fmt: v => 'R$ '+Math.round(v),
+        data: R.map(r => +r.cpl.toFixed(2)),
+        backgroundColor: '#FAC775', borderColor: '#BA7517', borderWidth: 1.5,
+        yAxisID: 'y', order: 2
+      },
+      {
+        label: 'CAC', _fmt: v => 'R$ '+Math.round(v),
+        data: R.map(r => +r.cac.toFixed(2)),
+        type: 'line', borderColor: '#D85A30', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [5,4], pointBackgroundColor: '#D85A30',
+        pointRadius: 6, pointHoverRadius: 8, yAxisID: 'y2', tension: 0.35, order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: interactionNearest,
+    plugins: { legend: { display: false }, tooltip: tooltipOff },
+    scales: {
+      x: { ticks: { autoSkip: false, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y: { title: { display: true, text: 'CPL (R$)', font: { size: 10 }, color: '#BA7517' }, ticks: { callback: v => 'R$'+Math.round(v), font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y2: { position: 'right', title: { display: true, text: 'CAC (R$)', font: { size: 10 }, color: '#D85A30' }, ticks: { callback: v => 'R$'+Math.round(v), font: { size: 10 } }, grid: { drawOnChartArea: false } }
+    }
+  },
+  plugins: [makeTooltipPlugin(tt2)]
+});
+buildLegend('leg2', ch2, [
+  { label: 'CPL', color: '#FAC775' },
+  { label: 'CAC', color: '#D85A30', dash: true }
+]);
+
+/* ── CHART 3: FUNIL VOLUME ── */
+const tt3 = document.getElementById('tt3');
+const ch3 = new Chart(document.getElementById('c3'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Leads', _fmt: v => v+' leads', data: D.map(m=>m.leads), backgroundColor: '#85B7EB', borderColor: '#378ADD', borderWidth: 1 },
+      { label: 'Orçamentos', _fmt: v => v+' orç.', data: D.map(m=>m.orc), backgroundColor: '#9FE1CB', borderColor: '#1D9E75', borderWidth: 1 },
+      { label: 'Pedidos', _fmt: v => v+' ped.', data: D.map(m=>m.ped), backgroundColor: '#FAC775', borderColor: '#BA7517', borderWidth: 1 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: interactionNearest,
+    plugins: { legend: { display: false }, tooltip: tooltipOff },
+    scales: {
+      x: { ticks: { autoSkip: false, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y: { ticks: { font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+    }
+  },
+  plugins: [makeTooltipPlugin(tt3)]
+});
+buildLegend('leg3', ch3, [
+  { label: 'Leads', color: '#85B7EB' },
+  { label: 'Orçamentos', color: '#9FE1CB' },
+  { label: 'Pedidos', color: '#FAC775' }
+]);
+
+/* ── CHART 4: TAXAS DE CONVERSÃO — all lines, no bars ── */
+const tt4 = document.getElementById('tt4');
+const ch4 = new Chart(document.getElementById('c4'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Lead → Orçamento', _fmt: v => v.toFixed(1)+'%',
+        data: R.map(r => +r.cvLO.toFixed(1)),
+        borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,0.08)',
+        borderWidth: 2.5, pointBackgroundColor: '#378ADD',
+        pointRadius: 7, pointHoverRadius: 10,
+        fill: false, tension: 0.35
+      },
+      {
+        label: 'Orç. → Pedido', _fmt: v => v.toFixed(1)+'%',
+        data: R.map(r => +r.cvOP.toFixed(1)),
+        borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)',
+        borderWidth: 2.5, borderDash: [6,4],
+        pointBackgroundColor: '#D85A30', pointStyle: 'rectRot',
+        pointRadius: 7, pointHoverRadius: 10,
+        fill: false, tension: 0.35
+      },
+      {
+        label: 'Lead → Pedido', _fmt: v => v.toFixed(1)+'%',
+        data: R.map(r => +r.cvLP.toFixed(1)),
+        borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.08)',
+        borderWidth: 2.5, borderDash: [3,3],
+        pointBackgroundColor: '#639922', pointStyle: 'triangle',
+        pointRadius: 7, pointHoverRadius: 10,
+        fill: false, tension: 0.35
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: interactionNearest,
+    plugins: { legend: { display: false }, tooltip: tooltipOff },
+    scales: {
+      x: { ticks: { autoSkip: false, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+      y: {
+        title: { display: true, text: 'Taxa (%)', font: { size: 10 } },
+        ticks: { callback: v => v+'%', font: { size: 10 } },
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        min: 0,
+        suggestedMax: 30
+      }
+    }
+  },
+  plugins: [makeTooltipPlugin(tt4)]
+});
+buildLegend('leg4', ch4, [
+  { label: 'Lead → Orçamento', color: '#378ADD' },
+  { label: 'Orç. → Pedido', color: '#D85A30', dash: true },
+  { label: 'Lead → Pedido', color: '#639922', dash: true }
+]);
+
+/* ── MONTH CARDS ── */
+const mg = document.getElementById('months-grid');
+D.forEach((m,i) => {
+  const r = R[i];
+  const prev = i > 0 ? R[i-1].roi : null;
+  const trend = prev !== null ? (r.roi > prev ? '↑' : r.roi < prev ? '↓' : '=') : '';
+  mg.innerHTML += `<div class="month-card">
+    <div class="month-header">
+      <span class="month-name">${m.name}</span>
+      <div class="month-badges">
+        <span class="badge badge-blue">ROAS ${r.roas.toFixed(2)}x</span>
+        <span class="badge badge-green">ROI ${r.roi.toFixed(0)}%${trend}</span>
+        <span class="badge badge-amber">CPL ${brl(r.cpl)}</span>
+        <span class="badge badge-coral">CAC ${brl(r.cac)}</span>
+      </div>
+    </div>
+    <div class="month-body">
+      <div class="row2">
+        <div class="stat-item"><div class="stat-lbl">Faturamento</div><div class="stat-val" style="color:#185FA5">${brl(m.fat)}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Custo total</div><div class="stat-val">${brl(r.tot)}</div></div>
+      </div>
+      <div class="row3">
+        <div class="stat-item"><div class="stat-lbl">Invest. ADS</div><div class="stat-val">${brl(m.ads)}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Gestão</div><div class="stat-val">${brl(m.gestao)}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Ticket médio</div><div class="stat-val">${brl(r.ticket)}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="row3">
+        <div class="stat-item"><div class="stat-lbl">Leads</div><div class="stat-val" style="color:#185FA5">${m.leads}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Orçamentos</div><div class="stat-val" style="color:#0F6E56">${m.orc}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Pedidos</div><div class="stat-val" style="color:#993C1D">${m.ped}</div></div>
+      </div>
+      <div class="row3" style="margin-top:10px">
+        <div class="stat-item"><div class="stat-lbl">CPL</div><div class="stat-val" style="color:#854F0B">${brl(r.cpl)}</div></div>
+        <div class="stat-item"><div class="stat-lbl">CAC</div><div class="stat-val" style="color:#993C1D">${brl(r.cac)}</div></div>
+        <div class="stat-item"><div class="stat-lbl">Lead → Ped.</div><div class="stat-val">${pct(r.cvLP)}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:10px;color:var(--text3)">Lead → Orçamento</span>
+          <span style="font-size:11px;font-weight:500;color:var(--text2)">${pct(r.cvLO)}</span>
+        </div>
+        <div class="cv-bar"><div class="cv-bar-fill" style="width:${Math.min(r.cvLO,100)}%;background:#378ADD"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span style="font-size:10px;color:var(--text3)">Orçamento → Pedido</span>
+          <span style="font-size:11px;font-weight:500;color:var(--text2)">${pct(r.cvOP)}</span>
+        </div>
+        <div class="cv-bar"><div class="cv-bar-fill" style="width:${Math.min(r.cvOP,100)}%;background:#D85A30"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span style="font-size:10px;color:var(--text3)">Lead → Pedido (geral)</span>
+          <span style="font-size:11px;font-weight:500;color:var(--text2)">${pct(r.cvLP)}</span>
+        </div>
+        <div class="cv-bar"><div class="cv-bar-fill" style="width:${Math.min(r.cvLP*5,100)}%;background:#639922"></div></div>
+      </div>
+    </div>
+  </div>`;
+});
+</script>
+</body>
+</html>

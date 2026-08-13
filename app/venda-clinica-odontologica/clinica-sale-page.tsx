@@ -15,7 +15,26 @@ import {
   CheckCircle2,
   Phone,
   ArrowRight,
+  TrendingUp,
+  Zap,
+  Droplets,
+  Landmark,
+  Home,
+  Sparkles,
+  Receipt,
 } from "lucide-react"
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+  PieChart,
+  Pie,
+} from "recharts"
 
 const WHATSAPP_URL =
   "https://wa.me/5511950234464?text=" +
@@ -212,10 +231,36 @@ function Carousel() {
 
 /* ---------------- Highlights data ---------------- */
 const HIGHLIGHTS = [
-  { icon: Stethoscope, value: 3, suffix: "", label: "Salas de atendimento completas com todos os equipamentos" },
-  { icon: Car, value: 8, suffix: "", label: "Vagas de estacionamento com acesso de acessibilidade" },
-  { icon: Users, value: 6000, prefix: "+", label: "Clientes ativos na carteira da clínica" },
-  { icon: Wallet, value: 20, prefix: "R$ ", suffix: " mil", label: "Faturamento garantido em contratos ativos" },
+  { icon: Stethoscope, value: 3, suffix: "", label: "Salas de atendimento completas com todos os equipamentos", splash: "" },
+  { icon: Car, value: 8, suffix: "", label: "Vagas de estacionamento com acesso de acessibilidade", splash: "" },
+  {
+    icon: Users,
+    value: 6000,
+    prefix: "+",
+    label: "Clientes ativos na carteira da clínica",
+    splash: "Convertendo só 20% em contratos (ticket médio R$ 200) = +R$ 24 mil/mês recorrente",
+  },
+  { icon: Wallet, value: 20, prefix: "R$ ", suffix: " mil", label: "Faturamento garantido em contratos ativos", splash: "" },
+]
+
+/* ---------------- Financial data ---------------- */
+const MONTHLY_COSTS = [
+  { icon: Home, label: "Aluguel", value: 12000, display: "R$ 12.000" },
+  { icon: Zap, label: "Energia Elétrica", value: 300, display: "R$ 300" },
+  { icon: Droplets, label: "Água e Esgoto", value: 200, display: "R$ 200" },
+  { icon: Landmark, label: "IPTU", value: 470, display: "R$ 470" },
+]
+const COSTS_TOTAL = MONTHLY_COSTS.reduce((s, c) => s + c.value, 0) // 12.970
+
+const COST_COLORS = ["#0d9488", "#14b8a6", "#2dd4bf", "#5eead4"]
+
+// values in R$ mil
+const REVENUE_DATA = [
+  { name: "Custos mensais", valor: 12.97, fill: "#f59e0b" },
+  { name: "Faturamento garantido", valor: 20, fill: "#5eead4" },
+  { name: "+20% da carteira", valor: 24, fill: "#14b8a6" },
+  { name: "Potencial mín.", valor: 65, fill: "#0d9488" },
+  { name: "Potencial máx.", valor: 85, fill: "#0f766e" },
 ]
 
 const FEATURES = [
@@ -333,7 +378,9 @@ export default function ClinicaSalePage() {
               <motion.div
                 whileHover={{ y: -6 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                className={`relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-sm ${
+                  h.splash ? "border-teal-300 ring-1 ring-teal-200" : "border-slate-200"
+                }`}
               >
                 <span className="grid h-12 w-12 place-items-center rounded-xl bg-teal-50 text-teal-600">
                   <h.icon className="h-6 w-6" />
@@ -342,11 +389,29 @@ export default function ClinicaSalePage() {
                   <CountUp to={h.value} prefix={h.prefix} suffix={h.suffix} />
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">{h.label}</p>
+                {h.splash && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ type: "spring", stiffness: 220, damping: 16, delay: 0.3 }}
+                    className="mt-4 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-500 p-3 text-white"
+                  >
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-teal-50">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Potencial imediato
+                    </span>
+                    <p className="mt-1 text-xs font-semibold leading-snug">{h.splash}</p>
+                  </motion.div>
+                )}
               </motion.div>
             </Reveal>
           ))}
         </div>
       </section>
+
+      {/* Financial analysis */}
+      <FinancialSection />
 
       {/* Gallery anchor / description */}
       <section id="galeria" className="border-y border-slate-100 bg-slate-50/60">
@@ -504,6 +569,237 @@ export default function ClinicaSalePage() {
         <WhatsappIcon className="relative h-7 w-7" />
       </a>
     </main>
+  )
+}
+
+/* ---------------- Chart tooltip ---------------- */
+function MoneyTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null
+  const v = payload[0].value as number
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-lg">
+      <p className="font-semibold text-slate-900">
+        R$ {v.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 1 })} mil/mês
+      </p>
+    </div>
+  )
+}
+
+/* ---------------- Financial section ---------------- */
+function FinancialSection() {
+  return (
+    <section className="relative overflow-hidden border-b border-slate-100 bg-white">
+      {/* decorative dentistry image accent */}
+      <div className="pointer-events-none absolute right-0 top-0 hidden h-full w-1/3 opacity-[0.06] lg:block">
+        <Image
+          src="/images/clinica/odonto-equipamento.png"
+          alt=""
+          fill
+          sizes="33vw"
+          className="object-cover"
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-16">
+        <Reveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-700">
+              <TrendingUp className="h-3.5 w-3.5" />
+              Análise financeira
+            </span>
+            <h2 className="mt-4 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+              Os números que fazem esse negócio valer a pena
+            </h2>
+            <p className="mt-3 text-pretty text-slate-600">
+              Custos enxutos e previsíveis diante de um potencial de faturamento
+              muito superior.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Cost table + pie */}
+          <Reveal>
+            <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600">
+                  <Receipt className="h-5 w-5" />
+                </span>
+                <h3 className="text-lg font-bold tracking-tight">
+                  Previsão de custos mensais médios
+                </h3>
+              </div>
+
+              <ul className="mt-6 divide-y divide-slate-100">
+                {MONTHLY_COSTS.map((c, i) => (
+                  <motion.li
+                    key={c.label}
+                    initial={{ opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                    className="flex items-center justify-between py-3"
+                  >
+                    <span className="flex items-center gap-3 text-sm text-slate-700">
+                      <span
+                        className="grid h-8 w-8 place-items-center rounded-lg text-white"
+                        style={{ backgroundColor: COST_COLORS[i] }}
+                      >
+                        <c.icon className="h-4 w-4" />
+                      </span>
+                      {c.label}
+                    </span>
+                    <span className="font-semibold tabular-nums text-slate-900">{c.display}</span>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-900 px-4 py-3 text-white">
+                <span className="text-sm font-medium text-slate-300">Custo mensal total</span>
+                <span className="text-lg font-bold tabular-nums">
+                  R$ <CountUp to={COSTS_TOTAL} />
+                </span>
+              </div>
+
+              <div className="mt-6 h-44 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={MONTHLY_COSTS}
+                      dataKey="value"
+                      nameKey="label"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={72}
+                      paddingAngle={2}
+                      stroke="none"
+                      animationDuration={1200}
+                    >
+                      {MONTHLY_COSTS.map((_, i) => (
+                        <Cell key={i} fill={COST_COLORS[i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, ""]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-center text-xs text-slate-500">Composição dos custos mensais</p>
+            </div>
+          </Reveal>
+
+          {/* Revenue bar chart */}
+          <Reveal delay={0.12}>
+            <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-50 text-teal-600">
+                  <TrendingUp className="h-5 w-5" />
+                </span>
+                <h3 className="text-lg font-bold tracking-tight">
+                  Custos x faturamento (R$ mil/mês)
+                </h3>
+              </div>
+
+              <div className="mt-6 h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={REVENUE_DATA} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 10, fill: "#64748b" }}
+                      interval={0}
+                      angle={-18}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
+                    <Tooltip content={<MoneyTooltip />} cursor={{ fill: "rgba(20,184,166,0.06)" }} />
+                    <Bar dataKey="valor" radius={[6, 6, 0, 0]} animationDuration={1400}>
+                      {REVENUE_DATA.map((d, i) => (
+                        <Cell key={i} fill={d.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="mt-2 text-center text-xs text-slate-500">
+                O faturamento garantido já cobre os custos com folga.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* 20% conversion splash */}
+        <Reveal delay={0.1}>
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className="mt-8 grid grid-cols-1 items-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 p-6 text-white shadow-xl shadow-teal-700/25 sm:p-8 lg:grid-cols-[1.4fr_1fr]">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide backdrop-blur-sm">
+                <Sparkles className="h-3.5 w-3.5" />
+                O poder da carteira de 6 mil clientes
+              </span>
+              <p className="mt-4 text-pretty text-lg font-semibold leading-relaxed sm:text-xl">
+                Convertendo apenas{" "}
+                <span className="rounded-md bg-white/20 px-1.5">20%</span> da carteira
+                em contratos mensais, com ticket médio de{" "}
+                <span className="rounded-md bg-white/20 px-1.5">R$ 200</span>, já são
+              </p>
+              <p className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+                + R$ <CountUp to={24} /> mil
+              </p>
+              <p className="mt-1 text-sm text-teal-50">
+                de faturamento fixo e recorrente — fora os diversos atendimentos
+                avulsos e procedimentos.
+              </p>
+            </div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-white/20">
+              <Image
+                src="/images/clinica/odonto-atendimento.png"
+                alt="Dentista atendendo paciente em clínica odontológica moderna"
+                fill
+                sizes="(max-width: 1024px) 100vw, 30vw"
+                className="object-cover"
+              />
+            </div>
+          </motion.div>
+        </Reveal>
+
+        {/* Potential revenue range */}
+        <Reveal delay={0.12}>
+          <div className="mt-8 overflow-hidden rounded-2xl border border-teal-100 bg-teal-50/60 p-6 text-center sm:p-10">
+            <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
+              Potencial real de faturamento
+            </p>
+            <div className="mt-3 flex items-center justify-center gap-3 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl">
+              <span>
+                R$ <CountUp to={65} />
+              </span>
+              <span className="text-teal-500">—</span>
+              <span>
+                R$ <CountUp to={85} /> mil
+              </span>
+            </div>
+            {/* animated range bar */}
+            <div className="mx-auto mt-6 h-3 max-w-2xl overflow-hidden rounded-full bg-teal-100">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500"
+                initial={{ width: "0%" }}
+                whileInView={{ width: "100%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </div>
+            <div className="mx-auto mt-2 flex max-w-2xl justify-between text-xs font-medium text-slate-500">
+              <span>R$ 65 mil/mês</span>
+              <span>R$ 85 mil/mês</span>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
   )
 }
 

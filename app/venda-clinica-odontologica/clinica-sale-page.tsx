@@ -22,6 +22,8 @@ import {
   Home,
   Sparkles,
   Receipt,
+  Clock,
+  BadgeDollarSign,
 } from "lucide-react"
 import {
   ResponsiveContainer,
@@ -262,6 +264,46 @@ const REVENUE_DATA = [
   { name: "Potencial mín.", valor: 65, fill: "#0d9488" },
   { name: "Potencial máx.", valor: 85, fill: "#0f766e" },
 ]
+
+/* ---------------- Payback data ---------------- */
+// Valor de venda: R$ 289 mil | Custo mensal: R$ 12,97 mil (values in R$ mil)
+const SALE_PRICE = 289
+const PAYBACK_SCENARIOS = [
+  {
+    key: "conservador",
+    label: "Conservador",
+    desc: "Somente com os contratos ativos garantidos",
+    receita: 20,
+    color: "#f59e0b",
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    ring: "ring-amber-200",
+  },
+  {
+    key: "realista",
+    label: "Realista",
+    desc: "Contratos + conversão de 20% da carteira",
+    receita: 44,
+    color: "#14b8a6",
+    bg: "bg-teal-50",
+    text: "text-teal-700",
+    ring: "ring-teal-200",
+    featured: true,
+  },
+  {
+    key: "otimista",
+    label: "Otimista",
+    desc: "Operando no potencial pleno (R$ 75 mil/mês)",
+    receita: 75,
+    color: "#0d9488",
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    ring: "ring-emerald-200",
+  },
+].map((s) => {
+  const lucro = s.receita - COSTS_TOTAL / 1000 // lucro líquido em R$ mil
+  return { ...s, lucro, meses: Math.ceil(SALE_PRICE / lucro) }
+})
 
 const FEATURES = [
   "Clínica completa com todos os equipamentos e mobiliários",
@@ -796,6 +838,92 @@ function FinancialSection() {
               <span>R$ 65 mil/mês</span>
               <span>R$ 85 mil/mês</span>
             </div>
+          </div>
+        </Reveal>
+
+        {/* Payback estimate */}
+        <Reveal delay={0.12}>
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-900 p-6 text-white sm:p-8">
+            <div className="flex flex-col items-center text-center">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wide backdrop-blur-sm">
+                <Clock className="h-3.5 w-3.5" />
+                Tempo de retorno do investimento
+              </span>
+              <h3 className="mt-4 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+                Em quanto tempo o investimento se paga?
+              </h3>
+              <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 text-sm text-slate-300">
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 font-semibold text-white">
+                  <BadgeDollarSign className="h-4 w-4 text-teal-300" />
+                  Valor de venda: R$ {SALE_PRICE} mil
+                </span>
+                <span>menos o custo mensal de R$ 12.970</span>
+              </p>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {PAYBACK_SCENARIOS.map((s, i) => (
+                <motion.div
+                  key={s.key}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, delay: i * 0.12 }}
+                  whileHover={{ y: -6 }}
+                  className={`relative flex flex-col rounded-2xl bg-white p-5 text-slate-900 shadow-lg ${
+                    s.featured ? "ring-2 ring-teal-400" : ""
+                  }`}
+                >
+                  {s.featured && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-teal-500 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white shadow">
+                      Cenário provável
+                    </span>
+                  )}
+                  <span
+                    className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${s.bg} ${s.text} ring-1 ${s.ring}`}
+                  >
+                    {s.label}
+                  </span>
+                  <div className="mt-4 flex items-baseline gap-1.5">
+                    <span
+                      className="text-5xl font-extrabold tracking-tight tabular-nums"
+                      style={{ color: s.color }}
+                    >
+                      <CountUp to={s.meses} />
+                    </span>
+                    <span className="text-sm font-semibold text-slate-500">meses</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Lucro líquido de R$ {s.lucro.toLocaleString("pt-BR")} mil/mês
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{s.desc}</p>
+
+                  {/* progress toward payback within 12 months reference */}
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: s.color }}
+                      initial={{ width: "0%" }}
+                      whileInView={{
+                        width: `${Math.min(100, (12 / s.meses) * 100)}%`,
+                      }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-[11px] text-slate-400">
+                    {s.meses <= 12
+                      ? "Retorno em menos de 1 ano"
+                      : `Cerca de ${(s.meses / 12).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} anos`}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="mt-6 text-center text-xs text-slate-400">
+              Estimativas de payback com base no lucro líquido (faturamento menos
+              custos fixos). Não incluem impostos, folha e variáveis de cada operação.
+            </p>
           </div>
         </Reveal>
       </div>

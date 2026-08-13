@@ -2,7 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { motion, AnimatePresence, useInView } from "framer-motion"
+
+const LocationMap = dynamic(() => import("./location-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[340px] w-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-sm text-slate-400 sm:h-[420px]">
+      Carregando mapa...
+    </div>
+  ),
+})
 import {
   ChevronLeft,
   ChevronRight,
@@ -24,6 +34,11 @@ import {
   Receipt,
   Clock,
   BadgeDollarSign,
+  Hospital,
+  GraduationCap,
+  ShoppingBag,
+  TramFront,
+  Bus,
 } from "lucide-react"
 import {
   ResponsiveContainer,
@@ -243,6 +258,15 @@ const HIGHLIGHTS = [
     splash: "Convertendo só 20% em contratos (ticket médio R$ 200) = +R$ 24 mil/mês recorrente",
   },
   { icon: Wallet, value: 20, prefix: "R$ ", suffix: " mil", label: "Faturamento garantido em contratos ativos", splash: "" },
+]
+
+/* ---------------- Nearby points ---------------- */
+const NEARBY_POINTS = [
+  { icon: Hospital, label: "Hospitais e dezenas de clínicas médicas", color: "#ef4444" },
+  { icon: ShoppingBag, label: "Shoppings de grande porte (Grand Plaza, Shopping ABC)", color: "#8b5cf6" },
+  { icon: GraduationCap, label: "Colégios e escolas de grande porte", color: "#f59e0b" },
+  { icon: TramFront, label: "Corredor de trólebus na Av. dos Andradas", color: "#0ea5e9" },
+  { icon: Bus, label: "Terminais e linhas de ônibus / fácil acesso", color: "#14b8a6" },
 ]
 
 /* ---------------- Financial data ---------------- */
@@ -515,7 +539,7 @@ export default function ClinicaSalePage() {
         </div>
       </section>
 
-      {/* Location banner */}
+      {/* Location + map */}
       <section className="mx-auto max-w-6xl px-4 py-14">
         <Reveal>
           <div className="flex flex-col items-start gap-4 rounded-2xl border border-teal-100 bg-teal-50/60 p-6 sm:flex-row sm:items-center sm:gap-6 sm:p-8">
@@ -532,6 +556,45 @@ export default function ClinicaSalePage() {
             </div>
           </div>
         </Reveal>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <Reveal>
+            <LocationMap />
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h4 className="flex items-center gap-2 text-base font-bold tracking-tight">
+                <MapPin className="h-5 w-5 text-teal-600" />
+                Principais pontos próximos
+              </h4>
+              <ul className="mt-4 space-y-3">
+                {NEARBY_POINTS.map((p, i) => (
+                  <motion.li
+                    key={p.label}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.4, delay: i * 0.07 }}
+                    className="flex items-center gap-3"
+                  >
+                    <span
+                      className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg text-white"
+                      style={{ backgroundColor: p.color }}
+                    >
+                      <p.icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-sm leading-snug text-slate-700">{p.label}</span>
+                  </motion.li>
+                ))}
+              </ul>
+              <p className="mt-5 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+                O mapa exibe apenas a posição aproximada da clínica para preservar a
+                privacidade do imóvel. O endereço completo é informado no contato.
+              </p>
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       {/* Final CTA */}

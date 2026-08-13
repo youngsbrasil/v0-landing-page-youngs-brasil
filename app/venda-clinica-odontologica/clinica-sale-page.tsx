@@ -225,7 +225,7 @@ const FEATURES = [
 
 export default function ClinicaSalePage() {
   return (
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="min-h-screen overflow-x-clip bg-white text-slate-900">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -253,7 +253,7 @@ export default function ClinicaSalePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-slate-100 bg-gradient-to-b from-teal-50/70 to-white">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-10 sm:gap-10 sm:py-12 lg:grid-cols-2 lg:py-16">
           <div>
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-700">
@@ -311,7 +311,7 @@ export default function ClinicaSalePage() {
       </section>
 
       {/* Highlights */}
-      <section className="mx-auto max-w-6xl px-4 py-14">
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:py-14">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-balance text-2xl font-bold tracking-tight sm:text-3xl">
@@ -323,7 +323,7 @@ export default function ClinicaSalePage() {
           </div>
         </Reveal>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {HIGHLIGHTS.map((h, i) => (
             <Reveal key={h.label} delay={i * 0.08}>
               <motion.div
@@ -346,7 +346,7 @@ export default function ClinicaSalePage() {
 
       {/* Gallery anchor / description */}
       <section id="galeria" className="border-y border-slate-100 bg-slate-50/60">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 py-12 sm:py-14 lg:grid-cols-2">
           <Reveal>
             <div>
               <span className="text-sm font-semibold uppercase tracking-wide text-teal-700">

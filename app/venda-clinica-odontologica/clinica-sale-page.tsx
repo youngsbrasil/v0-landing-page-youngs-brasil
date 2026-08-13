@@ -2,13 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import {
-  motion,
-  AnimatePresence,
-  useInView,
-  useMotionValue,
-  animate,
-} from "framer-motion"
+import { motion, AnimatePresence, useInView } from "framer-motion"
 import {
   ChevronLeft,
   ChevronRight,
@@ -72,24 +66,34 @@ function CountUp({
   suffix?: string
 }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: "-60px" })
-  const count = useMotionValue(0)
-  const [display, setDisplay] = useState("0")
+  const inView = useInView(ref, { once: true, amount: 0.2 })
+  const [value, setValue] = useState(0)
 
   useEffect(() => {
     if (!inView) return
-    const controls = animate(count, to, {
-      duration: 1.8,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => setDisplay(Math.floor(v).toLocaleString("pt-BR")),
-    })
-    return () => controls.stop()
-  }, [inView, to, count])
+    let raf = 0
+    const duration = 1800
+    const start = performance.now()
+    // easeOutCubic
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3)
+
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1)
+      setValue(Math.round(ease(t) * to))
+      if (t < 1) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        setValue(to)
+      }
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [inView, to])
 
   return (
     <span ref={ref}>
       {prefix}
-      {display}
+      {value.toLocaleString("pt-BR")}
       {suffix}
     </span>
   )

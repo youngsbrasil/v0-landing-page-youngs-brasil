@@ -257,7 +257,7 @@ const HIGHLIGHTS = [
     label: "Clientes ativos na carteira da clínica",
     splash: "Convertendo só 20% em contratos (ticket médio R$ 200) = +R$ 24 mil/mês recorrente",
   },
-  { icon: Wallet, value: 20, prefix: "R$ ", suffix: " mil", label: "Faturamento garantido em contratos ativos", splash: "" },
+  { icon: Wallet, value: 16, prefix: "R$ ", suffix: " mil", label: "Faturamento garantido em contratos ativos", splash: "" },
 ]
 
 /* ---------------- Nearby points ---------------- */
@@ -283,7 +283,7 @@ const COST_COLORS = ["#0d9488", "#14b8a6", "#2dd4bf", "#5eead4"]
 // values in R$ mil
 const REVENUE_DATA = [
   { name: "Custos mensais", valor: 12.97, fill: "#f59e0b" },
-  { name: "Faturamento garantido", valor: 20, fill: "#5eead4" },
+  { name: "Faturamento garantido", valor: 16, fill: "#5eead4" },
   { name: "+20% da carteira", valor: 24, fill: "#14b8a6" },
   { name: "Potencial mín.", valor: 65, fill: "#0d9488" },
   { name: "Potencial máx.", valor: 85, fill: "#0f766e" },
@@ -297,7 +297,7 @@ const PAYBACK_SCENARIOS = [
     key: "conservador",
     label: "Conservador",
     desc: "Somente com os contratos ativos garantidos",
-    receita: 20,
+    receita: 16,
     color: "#f59e0b",
     bg: "bg-amber-50",
     text: "text-amber-700",

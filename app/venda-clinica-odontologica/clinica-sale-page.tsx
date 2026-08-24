@@ -304,7 +304,7 @@ const PRICING = [
   },
   {
     key: "sem-marca",
-    value: 254,
+    value: 245,
     label: "Sem Marca e CNPJ",
     detail: "Estrutura, equipamentos e mobiliários",
     featured: false,

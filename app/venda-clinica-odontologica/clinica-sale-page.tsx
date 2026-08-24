@@ -292,6 +292,24 @@ const REVENUE_DATA = [
 /* ---------------- Payback data ---------------- */
 // Valor de venda: R$ 289 mil | Custo mensal: R$ 12,97 mil (values in R$ mil)
 const SALE_PRICE = 289
+
+/* ---------------- Pricing options ---------------- */
+const PRICING = [
+  {
+    key: "com-marca",
+    value: 289,
+    label: "Com Marca e CNPJ",
+    detail: "Marca, CNPJ e histórico da clínica inclusos",
+    featured: true,
+  },
+  {
+    key: "sem-marca",
+    value: 254,
+    label: "Sem Marca e CNPJ",
+    detail: "Estrutura, equipamentos e mobiliários",
+    featured: false,
+  },
+]
 const PAYBACK_SCENARIOS = [
   {
     key: "conservador",
@@ -614,18 +632,45 @@ export default function ClinicaSalePage() {
             </p>
           </Reveal>
           <Reveal delay={0.16}>
-            <div className="mx-auto mt-8 inline-flex flex-col items-center rounded-2xl border border-teal-400/30 bg-white/5 px-8 py-5 backdrop-blur-sm">
+            <div className="mx-auto mt-8 max-w-2xl">
               <span className="text-xs font-semibold uppercase tracking-wide text-teal-300">
-                Valor de venda
+                Valores de venda
               </span>
-              <motion.span
-                className="text-4xl font-extrabold tracking-tight sm:text-5xl"
-                animate={{ scale: [1, 1.04, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                R$ 289 <span className="text-teal-400">mil</span>
-              </motion.span>
-              <span className="mt-1 text-sm text-slate-300">
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {PRICING.map((p, i) => (
+                  <motion.div
+                    key={p.key}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.12 }}
+                    whileHover={{ y: -4 }}
+                    className={`rounded-2xl px-6 py-5 backdrop-blur-sm ${
+                      p.featured
+                        ? "border border-teal-400/40 bg-teal-400/10"
+                        : "border border-white/15 bg-white/5"
+                    }`}
+                  >
+                    <span
+                      className={`text-[11px] font-bold uppercase tracking-wide ${
+                        p.featured ? "text-teal-300" : "text-slate-400"
+                      }`}
+                    >
+                      {p.label}
+                    </span>
+                    <motion.p
+                      className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl"
+                      animate={p.featured ? { scale: [1, 1.04, 1] } : undefined}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      R$ {p.value}{" "}
+                      <span className={p.featured ? "text-teal-400" : "text-slate-400"}>mil</span>
+                    </motion.p>
+                    <span className="mt-1 block text-xs text-slate-400">{p.detail}</span>
+                  </motion.div>
+                ))}
+              </div>
+              <span className="mt-3 block text-sm text-slate-300">
                 Valor e forma de pagamento negociáveis
               </span>
             </div>
@@ -918,7 +963,7 @@ function FinancialSection() {
               <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 text-sm text-slate-300">
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 font-semibold text-white">
                   <BadgeDollarSign className="h-4 w-4 text-teal-300" />
-                  Valor de venda: R$ {SALE_PRICE} mil
+                  Valor de venda: R$ {SALE_PRICE} mil (com marca e CNPJ)
                 </span>
                 <span>menos o custo mensal de R$ 12.970</span>
               </p>
@@ -1011,25 +1056,50 @@ function PriceTag() {
           animate={{ x: "150%" }}
           transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 1.4, ease: "easeInOut" }}
         />
-        <div className="relative flex items-center gap-4 rounded-[14px] bg-white px-5 py-4">
-          <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-600">
-            <Wallet className="h-6 w-6" />
-          </span>
-          <div className="leading-tight">
-            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-              Valor de venda
-            </p>
-            <motion.p
-              className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
-              animate={{ scale: [1, 1.04, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              R$ 289 <span className="text-teal-600">mil</span>
-            </motion.p>
-            <p className="mt-0.5 text-xs font-medium text-slate-500">
-              Valor e forma de pagamento negociáveis
-            </p>
+        <div className="relative rounded-[14px] bg-white px-5 py-4">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-teal-700">
+            <Wallet className="h-4 w-4" />
+            Valores de venda
+          </p>
+
+          <div className="mt-3 flex flex-col gap-2">
+            {PRICING.map((p, i) => (
+              <motion.div
+                key={p.key}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.45, delay: 0.3 + i * 0.12 }}
+                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 ${
+                  p.featured
+                    ? "bg-teal-50 ring-1 ring-teal-200"
+                    : "bg-slate-50 ring-1 ring-slate-200"
+                }`}
+              >
+                <div className="leading-tight">
+                  <p
+                    className={`text-[11px] font-bold uppercase tracking-wide ${
+                      p.featured ? "text-teal-700" : "text-slate-500"
+                    }`}
+                  >
+                    {p.label}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-slate-500">{p.detail}</p>
+                </div>
+                <motion.p
+                  className="flex-shrink-0 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl"
+                  animate={p.featured ? { scale: [1, 1.04, 1] } : undefined}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  R$ {p.value}{" "}
+                  <span className={p.featured ? "text-teal-600" : "text-slate-400"}>mil</span>
+                </motion.p>
+              </motion.div>
+            ))}
           </div>
+
+          <p className="mt-3 text-xs font-medium text-slate-500">
+            Valor e forma de pagamento negociáveis
+          </p>
         </div>
       </div>
     </motion.div>

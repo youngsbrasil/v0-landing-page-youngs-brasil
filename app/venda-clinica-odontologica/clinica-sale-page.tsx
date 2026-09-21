@@ -625,20 +625,20 @@ export default function ClinicaSalePage() {
             </p>
           </Reveal>
           <Reveal delay={0.16}>
-            <div className="mx-auto mt-8 max-w-2xl">
-              <span className="text-xs font-semibold uppercase tracking-wide text-teal-300">
-                Valores de venda
-              </span>
-              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {PRICING.map((p, i) => (
-                  <motion.div
+  <div className="mx-auto mt-8 max-w-2xl text-center">
+  <span className="text-xs font-semibold uppercase tracking-wide text-teal-300">
+  Valores de venda
+  </span>
+  <div className="mt-3 grid grid-cols-1 justify-items-center gap-3">
+  {PRICING.map((p, i) => (
+  <motion.div
                     key={p.key}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: i * 0.12 }}
                     whileHover={{ y: -4 }}
-                    className={`rounded-2xl px-6 py-5 backdrop-blur-sm ${
+                    className={`mx-auto w-full max-w-md rounded-2xl px-6 py-5 backdrop-blur-sm ${
                       p.featured
                         ? "border border-teal-400/40 bg-teal-400/10"
                         : "border border-white/15 bg-white/5"

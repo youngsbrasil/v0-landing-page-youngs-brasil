@@ -290,24 +290,17 @@ const REVENUE_DATA = [
 ]
 
 /* ---------------- Payback data ---------------- */
-// Valor de venda: R$ 289 mil | Custo mensal: R$ 12,97 mil (values in R$ mil)
-const SALE_PRICE = 289
+// Valor de venda: R$ 200 mil sem CNPJ | Custo mensal: R$ 12,97 mil (values in R$ mil)
+const SALE_PRICE = 200
 
 /* ---------------- Pricing options ---------------- */
 const PRICING = [
   {
-    key: "com-marca",
-    value: 289,
-    label: "Com Marca e CNPJ",
-    detail: "Marca, CNPJ e histórico da clínica inclusos",
-    featured: true,
-  },
-  {
-    key: "sem-marca",
-    value: 245,
-    label: "Sem Marca e CNPJ",
+    key: "sem-cnpj",
+    value: 200,
+    label: "Sem CNPJ",
     detail: "Estrutura, equipamentos e mobiliários",
-    featured: false,
+    featured: true,
   },
 ]
 const PAYBACK_SCENARIOS = [
@@ -963,7 +956,7 @@ function FinancialSection() {
               <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 text-sm text-slate-300">
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 font-semibold text-white">
                   <BadgeDollarSign className="h-4 w-4 text-teal-300" />
-                  Valor de venda: R$ {SALE_PRICE} mil (com marca e CNPJ)
+                  Valor de venda: R$ {SALE_PRICE} mil (sem CNPJ)
                 </span>
                 <span>menos o custo mensal de R$ 12.970</span>
               </p>

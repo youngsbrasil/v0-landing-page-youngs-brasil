@@ -271,7 +271,7 @@ const NEARBY_POINTS = [
 
 /* ---------------- Financial data ---------------- */
 const MONTHLY_COSTS = [
-  { icon: Home, label: "Aluguel", value: 12000, display: "R$ 12.000" },
+  { icon: Home, label: "Aluguel", value: 8000, display: "R$ 8.000" },
   { icon: Zap, label: "Energia Elétrica", value: 300, display: "R$ 300" },
   { icon: Droplets, label: "Água e Esgoto", value: 200, display: "R$ 200" },
   { icon: Landmark, label: "IPTU", value: 470, display: "R$ 470" },
